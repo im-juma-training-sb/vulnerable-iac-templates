@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: root-privileged-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: root-privileged-app
+  template:
+    metadata:
+      labels:
+        app: root-privileged-app
+    spec:
+      containers:
+      - name: app
+        image: nginx:latest 
+        ports:
+        - containerPort: 80
+        
+        securityContext:
+          runAsUser: 0  
+          
