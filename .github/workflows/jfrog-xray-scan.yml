@@ -1,0 +1,32 @@
+name: JFrog Xray IaC Scan
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install JFrog CLI
+        run: |
+          curl -fL https://install-cli.jfrog.io | sh
+          jf --version
+
+      - name: Configure JFrog CLI
+        env:
+          JFROG_URL: ${{ secrets.JFROG_URL }}
+          JFROG_USER: ${{ secrets.JFROG_USER }}
+          JFROG_PASSWORD: ${{ secrets.JFROG_PASSWORD }}
+        run: |
+          jf c add --url=$JFROG_URL --user=$JFROG_USER --password=$JFROG_PASSWORD --interactive=false
+
+      - name: Run JFrog Xray Scan
+        run: jf xr scan .
