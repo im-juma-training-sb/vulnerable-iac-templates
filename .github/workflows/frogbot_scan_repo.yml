@@ -1,0 +1,49 @@
+name: "Frogbot Scan Repository"
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+  schedule:
+    # Run scan only if the default branch is main
+    - cron: "0 0 * * *"
+
+permissions:
+  contents: write
+  pull-requests: write
+  security-events: write
+
+
+jobs:
+  scan-repository:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'  # Ensures job runs only on the main branch
+    steps:
+      - uses: jfrog/frogbot@v2
+        env:
+          # [Mandatory]
+          # JFrog platform URL
+          JF_URL: ${{ vars.JF_URL }}
+
+          # [Mandatory if JF_USER and JF_PASSWORD are not provided]
+          # JFrog access token with 'read' permissions on Xray service
+          JF_ACCESS_TOKEN: ${{ secrets.JFROG_PASSWORD }}
+
+          # [Mandatory if JF_ACCESS_TOKEN is not provided]
+          # JFrog username with 'read' permissions for Xray. Must be provided with JF_PASSWORD
+          # JF_USER: ${{ secrets.JF_USER }}
+
+          # [Mandatory if JF_ACCESS_TOKEN is not provided]
+          # JFrog password. Must be provided with JF_USER
+          # JF_PASSWORD: ${{ secrets.JF_PASSWORD }}
+
+          # [Mandatory]
+          # The GitHub token is automatically generated for the job
+          JF_GIT_TOKEN: ${{ secrets.GH_TOKEN }}
+
+          # [Mandatory]
+          # The name of the branch on which Frogbot will perform the scan
+          JF_GIT_BASE_BRANCH: main  
+
+       
