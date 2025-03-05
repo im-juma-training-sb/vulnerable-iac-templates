@@ -26,7 +26,7 @@ jobs:
           JFROG_USER: ${{ secrets.JFROG_USER }}
           JFROG_PASSWORD: ${{ secrets.JFROG_PASSWORD }}
         run: |
-          jf c add myJFrogServer --url=jf c add myJFrogServer --url=JFROG_URL --user=$JFROG_USER --password=$JFROG_PASSWORD --interactive=false --user=$JFROG_USER --password=$JFROG_PASSWORD --interactive=false
+          jf c add myJFrogServer --url=jf c add myJFrogServer --url=$JFROG_URL --user=$JFROG_USER --password=$JFROG_PASSWORD --interactive=false --user=$JFROG_USER --password=$JFROG_PASSWORD --interactive=false
           jf c use myJFrogServer
 
       - name: Upload IaC Files to Artifactory
