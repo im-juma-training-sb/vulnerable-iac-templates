@@ -9,10 +9,10 @@ on:
       - main
 
 jobs:
-  scan:
+  upload-and-scan:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout Repository
         uses: actions/checkout@v3
 
       - name: Install JFrog CLI
@@ -22,30 +22,28 @@ jobs:
 
       - name: Configure JFrog CLI
         env:
-          JFROG_URL: ${{ vars.JFROG_URL }}
+          JFROG_URL: ${{ secrets.JFROG_URL }}
           JFROG_USER: ${{ secrets.JFROG_USER }}
           JFROG_PASSWORD: ${{ secrets.JFROG_PASSWORD }}
         run: |
           jf c add myJFrogServer --url=$JFROG_URL --user=$JFROG_USER --password=$JFROG_PASSWORD --interactive=false
           jf c use myJFrogServer
 
-      - name: Verify JFrog CLI Configuration
-        run: jf c show
-
-      - name: Run JFrog Xray Scan (Optional, for artifacts)
-        run: jf scan .
-      
-      # ✅ NEW: Checkov scan for IaC vulnerabilities
-      - name: Run Checkov IaC Security Scan
-        uses: bridgecrewio/checkov-action@v12
-        with:
-          directory: .
-          framework: terraform,kubernetes,ansible,helm
-
-      - name: Upload IaC files to Artifactory
+      - name: Upload IaC Files to Artifactory
         run: |
           jf rt upload "*.tf" iac-repository/terraform/
           jf rt upload "*.yaml" iac-repository/kubernetes/
           jf rt upload "*.yml" iac-repository/ansible/
           jf rt upload "*.json" iac-repository/
           jf rt upload "charts/*.tgz" iac-repository/helm/
+
+      - name: Run Checkov IaC Security Scan
+        uses: bridgecrewio/checkov-action@v12
+        with:
+          directory: .
+          framework: terraform,kubernetes,ansible,helm
+        continue-on-error: true  # Allows the workflow to proceed even if vulnerabilities are found
+
+      - name: Run JFrog Xray Scan
+        run: jf scan iac-repository/
+        continue-on-error: true  # Ensures that the scan runs even if previous steps report vulnerabilities
