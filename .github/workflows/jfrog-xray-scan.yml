@@ -31,11 +31,11 @@ jobs:
 
       - name: Upload IaC Files to Artifactory
         run: |
-          jf rt upload "*.tf" iac-repository/terraform/
-          jf rt upload "*.yaml" iac-repository/kubernetes/
-          jf rt upload "*.yml" iac-repository/ansible/
-          jf rt upload "*.json" iac-repository/
-          jf rt upload "charts/*.tgz" iac-repository/helm/
+          jf rt upload "*.tf" https://infomagnus.jfrog.io/artifactory/api/generic/iac-repository
+          jf rt upload "*.yaml" https://infomagnus.jfrog.io/artifactory/api/generic/iac-repository
+          jf rt upload "*.yml" https://infomagnus.jfrog.io/artifactory/api/generic/iac-repository
+          jf rt upload "*.json" https://infomagnus.jfrog.io/artifactory/api/generic/iac-repository
+          jf rt upload "charts/*.tgz" https://infomagnus.jfrog.io/artifactory/api/generic/iac-repository
 
       - name: Run Checkov IaC Security Scan
         uses: bridgecrewio/checkov-action@v12
