@@ -24,7 +24,7 @@ jobs:
         env:
           JFROG_URL: ${{ secrets.JFROG_URL }}
           JFROG_USER: ${{ secrets.JFROG_USER }}
-          JFROG_PASSWORD: ${{ secrets.JFROG_PASSWORD }}
+          JFROG_PASSWORD: ${{ secrets.JF_ACCESS_TOKEN }}
         run: |
           jf c add --url=$JFROG_URL --user=$JFROG_USER --password=$JF_ACCESS_TOKEN --interactive=false
 
