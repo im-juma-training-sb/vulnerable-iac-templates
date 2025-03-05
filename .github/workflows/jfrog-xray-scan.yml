@@ -1,4 +1,4 @@
-name: JFrog Xray IaC Scan
+name: JFrog Xray & Checkov IaC Scan
 
 on:
   push:
@@ -24,7 +24,7 @@ jobs:
         env:
           JFROG_URL: ${{ vars.JFROG_URL }}
           JFROG_USER: ${{ secrets.JFROG_USER }}
-          JFROG_PASSWORD: ${{ secrets.JFROG_PASSWORD }} 
+          JFROG_PASSWORD: ${{ secrets.JFROG_PASSWORD }}
         run: |
           jf c add myJFrogServer --url=$JFROG_URL --user=$JFROG_USER --password=$JFROG_PASSWORD --interactive=false
           jf c use myJFrogServer
@@ -32,5 +32,20 @@ jobs:
       - name: Verify JFrog CLI Configuration
         run: jf c show
 
-      - name: Run JFrog Xray Scan
+      - name: Run JFrog Xray Scan (Optional, for artifacts)
         run: jf scan .
+      
+      # ✅ NEW: Checkov scan for IaC vulnerabilities
+      - name: Run Checkov IaC Security Scan
+        uses: bridgecrewio/checkov-action@v12
+        with:
+          directory: .
+          framework: terraform,kubernetes,ansible,helm
+
+      - name: Upload IaC files to Artifactory
+        run: |
+          jf rt upload "*.tf" iac-repository/terraform/
+          jf rt upload "*.yaml" iac-repository/kubernetes/
+          jf rt upload "*.yml" iac-repository/ansible/
+          jf rt upload "*.json" iac-repository/
+          jf rt upload "charts/*.tgz" iac-repository/helm/
